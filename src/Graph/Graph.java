@@ -112,7 +112,7 @@ public class Graph {
 			return null;
 		}
 		
-		Graph clone = new Graph();
+		Graph dijkstraGraph = new Graph();
 		HashMap<String, Double> values = new HashMap<String, Double>();
 		HashMap<String, String> previous = new HashMap<String, String>();
 		VComparator comp = new VComparator(values);
@@ -120,7 +120,7 @@ public class Graph {
 		
 		for(Vertex v: this.vertex){
 			values.put(v.getIdentifier(), Double.MAX_VALUE);
-			values.put(v.getIdentifier(), null);
+			previous.put(v.getIdentifier(), null);
 		}
 		
 		values.remove(id);
@@ -144,14 +144,47 @@ public class Graph {
 						comp.update(values);
 						pq.add(e.getTo());
 					}
-					else{
-						
+				}
+				else if(!this.directed){
+					if(e.getV1().equals(pq.peek()) && !previous.get(pq.peek()).equals(e.getV2())){
+						if(values.get(e.getV2()) >= e.getWeight()+values.get(e.getV1())){
+							values.remove(e.getV2());
+							values.put(e.getV2(), e.getWeight()+values.get(e.getV1()));
+							previous.remove(e.getV2());
+							previous.put(e.getV2(), e.getV1());
+							if(pq.contains(e.getV2())){
+								pq.remove(e.getV2());
+							}
+							comp.update(values);
+							pq.add(e.getV2());
+						}
+					}
+					else if(e.getV2().equals(pq.peek()) && !previous.get(pq.peek()).equals(e.getV1())){
+						if(values.get(e.getV1()) >= e.getWeight()+values.get(e.getV2())){
+							values.remove(e.getV1());
+							values.put(e.getV1(), e.getWeight()+values.get(e.getV2()));
+							previous.remove(e.getV1());
+							previous.put(e.getV1(), e.getV2());
+							if(pq.contains(e.getV1())){
+								pq.remove(e.getV1());
+							}
+							comp.update(values);
+							pq.add(e.getV1());
+						}
 					}
 				}
 			}
+			pq.remove();
 		}
 		
-		return null;
+		for(Vertex v: this.vertex){
+			dijkstraGraph.addVertex(v.getIdentifier());
+			if(previous.get(v.getIdentifier()) != null){
+				dijkstraGraph.addEdge(v.getIdentifier(), previous.get(v.getIdentifier()), 0.0, true);
+			}
+		}
+		
+		return dijkstraGraph;
 		
 		
 	}
@@ -183,5 +216,9 @@ public class Graph {
 		testG.addEdge("B", "C", 1.0);
 		testG.removeEdge("A", "B");
 		System.out.println(testG);
+		
+		Graph otherG = testG.dijkstra("A");
+		System.out.println(otherG);
+		
 	}
 }
