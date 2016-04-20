@@ -131,9 +131,6 @@ public class Graph {
 		pq.add(id);
 		while(!pq.isEmpty()){
 			for(Edge e: this.vertex.get(this.vertex.indexOf(new Vertex(pq.peek()))).getEdges()){
-				
-				System.out.println(e.getV1() + "---" + e.getV2());
-				
 				if(this.directed && e.getFrom().equals(pq.peek())){
 					if(values.get(e.getTo()) >= e.getWeight()+values.get(e.getFrom())){
 						
@@ -149,7 +146,7 @@ public class Graph {
 					}
 				}
 				else if(!this.directed){
-					if(e.getV1().equals(pq.peek()) && !previous.get(pq.peek()).equals(e.getV2())){
+					if(e.getV1().equals(pq.peek()) && (previous.get(pq.peek()) == null)?true:!previous.get(pq.peek()).equals(e.getV2())){
 						if(values.get(e.getV2()) >= e.getWeight()+values.get(e.getV1())){
 							values.remove(e.getV2());
 							values.put(e.getV2(), e.getWeight()+values.get(e.getV1()));
@@ -222,14 +219,18 @@ public class Graph {
 	public static void main(String args[]){
 		Graph testG = new Graph(false);
 		
-		testG.addEdge("A", "B", 1.5, true);
-		testG.addEdge("A", "C", 2.0, true);
-		testG.addEdge("B", "C", 1.0);
-		testG.addEdge("B", "C", 1.0);
+		testG.addEdge("A", "C", 10.0, true);
+		testG.addEdge("A", "D", 3.0, true);
+		testG.addEdge("D", "C", 4.0, true);
+		testG.addEdge("C", "B", 20.0, true);
+		testG.addEdge("B", "E", 4.0, true);
+		testG.addEdge("B", "F", 4.0, true);
+		testG.addEdge("B", "E", 4.0, true);
+		testG.addEdge("E", "F", 4.0, true);
 		//testG.removeEdge("A", "B");
 		System.out.println(testG);
 		
-		testG.printEdges();
+		//testG.printEdges();
 		
 		Graph otherG = testG.dijkstra("A");
 		System.out.println(otherG);
