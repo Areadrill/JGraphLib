@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class Vertex {
 	private String identifier;
 	private ArrayList<Edge> edges;
+	private int key;
 	
 	public Vertex(String id){
 		this.identifier = id;
