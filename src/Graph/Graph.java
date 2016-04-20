@@ -112,7 +112,7 @@ public class Graph {
 			return null;
 		}
 		
-		Graph dijkstraGraph = new Graph();
+		Graph dijkstraGraph = new Graph(this.directed);
 		HashMap<String, Double> values = new HashMap<String, Double>();
 		HashMap<String, String> previous = new HashMap<String, String>();
 		VComparator comp = new VComparator(values);
@@ -131,6 +131,9 @@ public class Graph {
 		pq.add(id);
 		while(!pq.isEmpty()){
 			for(Edge e: this.vertex.get(this.vertex.indexOf(new Vertex(pq.peek()))).getEdges()){
+				
+				System.out.println(e.getV1() + "---" + e.getV2());
+				
 				if(this.directed && e.getFrom().equals(pq.peek())){
 					if(values.get(e.getTo()) >= e.getWeight()+values.get(e.getFrom())){
 						
@@ -180,7 +183,7 @@ public class Graph {
 		for(Vertex v: this.vertex){
 			dijkstraGraph.addVertex(v.getIdentifier());
 			if(previous.get(v.getIdentifier()) != null){
-				dijkstraGraph.addEdge(v.getIdentifier(), previous.get(v.getIdentifier()), 0.0, true);
+				dijkstraGraph.addEdge(previous.get(v.getIdentifier()), v.getIdentifier(), 0.0, true);
 			}
 		}
 		
@@ -206,16 +209,27 @@ public class Graph {
 		
 	}
 	
+	public void printEdges(){
+		for(Vertex v: this.vertex){
+			for(Edge e: v.getEdges()){
+				System.out.println(e.getV1() + "---" + e.getV2());
+			}
+		}
+		System.out.println("\n\n\n");
+	}
+	
 	
 	public static void main(String args[]){
-		Graph testG = new Graph(true);
+		Graph testG = new Graph(false);
 		
 		testG.addEdge("A", "B", 1.5, true);
 		testG.addEdge("A", "C", 2.0, true);
 		testG.addEdge("B", "C", 1.0);
 		testG.addEdge("B", "C", 1.0);
-		testG.removeEdge("A", "B");
+		//testG.removeEdge("A", "B");
 		System.out.println(testG);
+		
+		testG.printEdges();
 		
 		Graph otherG = testG.dijkstra("A");
 		System.out.println(otherG);
