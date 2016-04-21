@@ -36,6 +36,14 @@ public class GraphTests {
 		int priorSize = g.getNumVertex();
 		assertTrue(g.addEdge("A", "B", 1.0, true));
 		assertEquals((g.getNumVertex() - priorSize), 2);
+		assertFalse(g.addEdge("A", "B", 1.0, true));
 	}
-	//to be continued...
+	
+	@Test
+	public void testEdgeDirectedValues(){
+		Graph g = new Graph(true);
+		
+		g.addEdge("A", "B", 3.0, true);
+				
+	}
 }

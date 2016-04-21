@@ -209,13 +209,17 @@ public class Graph {
 	public void printEdges(){
 		for(Vertex v: this.vertex){
 			for(Edge e: v.getEdges()){
-				System.out.println(e.getV1() + "---" + e.getV2());
+				System.out.println(e.getV1() + ((this.directed)?"-->":"---") + e.getV2());
 			}
 		}
 		System.out.println("\n\n\n");
 	}
 	
 	
+	public ArrayList<Vertex> getVertex() {
+		return vertex;
+	}
+
 	public static void main(String args[]){
 		Graph testG = new Graph(false);
 		
