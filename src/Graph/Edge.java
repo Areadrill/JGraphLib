@@ -8,12 +8,9 @@ public class Edge {
 	private boolean directed;
 	private double weight;
 	
-	
 	public Edge(String v1, String v2, double weight){
 		this(v1, v2, weight, false);
 	}
-	
-	
 
 	public Edge(String v1, String v2, double weight, boolean directed){
 		this.directed = directed;
