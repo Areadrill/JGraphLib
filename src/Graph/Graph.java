@@ -3,6 +3,7 @@ package Graph;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.PriorityQueue;
 
 public class Graph {
@@ -95,11 +96,29 @@ public class Graph {
 			return false;
 		}
 
-		for (Edge e : this.vertex.get(this.vertex.indexOf(id)).getEdges()) {
-			this.removeEdge(e);
+		ListIterator<Edge> it = this.vertex.get(this.vertex.indexOf(new Vertex(id))).getEdges().listIterator(0);
+		while(it.hasNext()){
+			Edge e = it.next();
+			it.remove();
+			if(this.directed){
+				if(e.getFrom().equals(id)){
+					this.vertex.get(this.vertex.indexOf(new Vertex(e.getTo()))).getEdges().remove(e);
+				}
+				else{
+					this.vertex.get(this.vertex.indexOf(new Vertex(e.getFrom()))).getEdges().remove(e);
+				}
+			}
+			else{
+				if(e.getV1().equals(id)){
+					this.vertex.get(this.vertex.indexOf(new Vertex(e.getV2()))).getEdges().remove(e);
+				}
+				else{
+					this.vertex.get(this.vertex.indexOf(new Vertex(e.getV1()))).getEdges().remove(e);
+				}
+			}
 		}
 
-		return this.vertex.remove(id);
+		return this.vertex.remove(new Vertex(id));
 
 	}
 
@@ -147,6 +166,15 @@ public class Graph {
 		return resultGraph;
 	}
 
+	public Graph invertedRangedDfs(String id, double range){
+		Graph cloneGraph = new Graph(this);
+		Graph normalRDFS = rangedDfs(id, range);
+		for(Vertex v: normalRDFS.vertex){
+			cloneGraph.removeVertex(v.getIdentifier());
+		}
+		return cloneGraph;
+	}
+	
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (Vertex v : vertex) {
@@ -361,7 +389,7 @@ public class Graph {
 	public void printEdges() {
 		for (Vertex v : this.vertex) {
 			for (Edge e : v.getEdges()) {
-				System.out.println(e.getV1() + ((this.directed) ? "-->" : "---") + e.getV2());
+				System.out.println((this.directed)?(e.getFrom() + "-->" + e.getTo()):(e.getV1() + "---" + e.getV2()));
 			}
 		}
 		System.out.println("\n\n\n");
@@ -385,18 +413,18 @@ public class Graph {
 		testG.addEdge("A", "B", 10.0, true);
 		testG.addEdge("B", "C", 20.0, true);
 		testG.addEdge("B", "D", 5.0, true);
-		testG.addEdge("D", "C", 5.0, true);
+		testG.addEdge("D", "C", 55.0, true);
 
 		System.out.println(testG);
 
 		// System.out.println(testG.getVertex().indexOf("A"));
 
-		System.out.println("\n\n\n" + testG.rangedDfs("A", 30.0));
+		System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
 
 		// testG.printEdges();
 
-		Graph otherG = testG.dijkstra("A");
-		// System.out.println(otherG);
+		/*Graph otherG = testG.dijkstra("A");
+		 System.out.println(otherG);*/
 
 	}
 }
