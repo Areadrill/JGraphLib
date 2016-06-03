@@ -22,28 +22,28 @@ public class GraphTests {
 	public void testAddEdgeNoforce(){
 		Graph g = new Graph();
 		assertEquals(g.getNumVertex(), 0);
-		assertFalse(g.addEdge("A", "B", 1.0, false));
+		assertFalse(g.addEdge("A", "B", new double[]{1.0, 1.0}, false));
 		
 		g.addVertex("A");
 		g.addVertex("B");
-		assertTrue(g.addEdge("A", "B", 1.0, false));
-		assertFalse(g.addEdge("A", "B", 1.0, false));
+		assertTrue(g.addEdge("A", "B", new double[]{1.0, 1.0}, false));
+		assertFalse(g.addEdge("A", "B", new double[]{1.0, 1.0}, false));
 	}
 	
 	@Test
 	public void testaddEdgeForce(){
 		Graph g = new Graph();
 		int priorSize = g.getNumVertex();
-		assertTrue(g.addEdge("A", "B", 1.0, true));
+		assertTrue(g.addEdge("A", "B", new double[]{1.0, 1.0}, true));
 		assertEquals((g.getNumVertex() - priorSize), 2);
-		assertFalse(g.addEdge("A", "B", 1.0, true));
+		assertFalse(g.addEdge("A", "B", new double[]{1.0, 1.0}, true));
 	}
 	
 	@Test
 	public void testEdgeDirectedValues(){
 		Graph g = new Graph(true);
 		
-		g.addEdge("A", "B", 3.0, true);
+		g.addEdge("A", "B", new double[]{3.0, 3.0}, true);
 				
 	}
 }

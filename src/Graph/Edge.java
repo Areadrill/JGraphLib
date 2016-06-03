@@ -6,13 +6,13 @@ public class Edge {
 	private String to;
 	private String from;
 	private boolean directed;
-	private double weight;
+	private double[] weight;
 	
-	public Edge(String v1, String v2, double weight){
+	public Edge(String v1, String v2, double[] weight){
 		this(v1, v2, weight, false);
 	}
 
-	public Edge(String v1, String v2, double weight, boolean directed){
+	public Edge(String v1, String v2, double[] weight, boolean directed){
 		this.directed = directed;
 		if(this.directed){
 			this.to = v2;
@@ -26,11 +26,25 @@ public class Edge {
 		
 	}
 
-	public double getWeight() {
+	public double getWeight(int choice) {
+		if(choice > 1){
+			return -1.123456789;
+		}
+		return weight[choice];
+	}
+	
+	public double[] getWeight(){
 		return weight;
 	}
 
-	public void setWeight(double weight) {
+	public void setWeight(double weight, int choice) {
+		if(choice > 1){
+			return;
+		}
+		this.weight[choice] = weight;
+	}
+	
+	public void setWeight(double[] weight) {
 		this.weight = weight;
 	}
 

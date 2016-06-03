@@ -9,6 +9,8 @@ import java.util.PriorityQueue;
 public class Graph {
 	private static final boolean DIRECTED = true;
 	private static final boolean UNDIRECTED = false;
+	private static final int DISTANCE = 0;
+	private static final int TIME = 1;
 	private ArrayList<Vertex> vertex;
 	private boolean directed;
 
@@ -44,11 +46,11 @@ public class Graph {
 		return false;
 	}
 
-	public void addEdge(String v1, String v2, double w) {
+	public void addEdge(String v1, String v2, double[] w) {
 		addEdge(v1, v2, w, false);
 	}
 
-	public boolean addEdge(String v1, String v2, double w, boolean force) {
+	public boolean addEdge(String v1, String v2, double[] w, boolean force) {
 		if (!this.vertex.contains(new Vertex(v1))) {
 			if (force) {
 				this.addVertex(v1);
@@ -83,9 +85,9 @@ public class Graph {
 		else if (!this.vertex.contains(new Vertex(v1)) || !this.vertex.contains(new Vertex(v2))) {
 			return false;
 		}
-
-		this.vertex.get(this.vertex.indexOf(new Vertex(v1))).getEdges().remove(new Edge(v1, v2, 0.0, this.directed));
-		this.vertex.get(this.vertex.indexOf(new Vertex(v2))).getEdges().remove(new Edge(v1, v2, 0.0, this.directed));
+		double[] temp = {0.0, 0.0};
+		this.vertex.get(this.vertex.indexOf(new Vertex(v1))).getEdges().remove(new Edge(v1, v2, temp, this.directed));
+		this.vertex.get(this.vertex.indexOf(new Vertex(v2))).getEdges().remove(new Edge(v1, v2, temp, this.directed));
 		return true;
 	}
 
@@ -131,29 +133,29 @@ public class Graph {
 
 	}
 
-	public ArrayList<Vertex> rangedDfs(String id, double range) {
+	public ArrayList<Vertex> rangedDfs(String id, double range, int criteria) {
 		Graph g = new Graph(this.directed);
 		g.addVertex(id);
-		return (this.directed) ? rangedDfsDirected(id, range, 0.0, g).vertex : rangedDfsUndirected(id, range, 0.0, g, null).vertex;
+		return (this.directed) ? rangedDfsDirected(id, range, 0.0, g, criteria).vertex : rangedDfsUndirected(id, range, 0.0, g, null, criteria).vertex;
 	}
 
-	public Graph rangedDfsDirected(String id, double range, double accumulator, Graph resultGraph) {
+	public Graph rangedDfsDirected(String id, double range, double accumulator, Graph resultGraph, int criteria) {
 		if (accumulator >= range)
 			return resultGraph;
 
 		for (Edge e : this.vertex.get(this.vertex.indexOf(new Vertex(id))).getEdges()) {
 			if (e.getTo().equals(id))
 				continue;
-			else if (e.getFrom().equals(id) && e.getWeight() + accumulator < range) {
+			else if (e.getFrom().equals(id) && e.getWeight(criteria) + accumulator < range) {
 				resultGraph.addVertex(e.getTo());
-				resultGraph = rangedDfsDirected(e.getTo(), range, accumulator + e.getWeight(), resultGraph);
+				resultGraph = rangedDfsDirected(e.getTo(), range, accumulator + e.getWeight(criteria), resultGraph, criteria);
 			}
 		}
 
 		return resultGraph;
 	}
 
-	public Graph rangedDfsUndirected(String id, double range, double accumulator, Graph resultGraph, Vertex previous) {
+	public Graph rangedDfsUndirected(String id, double range, double accumulator, Graph resultGraph, Vertex previous, int criteria) {
 		if (accumulator >= range)
 			return resultGraph;
 
@@ -162,22 +164,22 @@ public class Graph {
 					|| (e.getV2().equals(id) && (previous != null) ? (previous.equals(new Vertex(e.getV1())))
 							: false)) {
 				continue;
-			} else if (e.getV1().equals(id) && e.getWeight() + accumulator < range) {
+			} else if (e.getV1().equals(id) && e.getWeight(criteria) + accumulator < range) {
 				resultGraph.addVertex(e.getV2());
-				resultGraph = rangedDfsUndirected(e.getV2(), range, e.getWeight() + accumulator, resultGraph,
-						this.vertex.get(this.vertex.indexOf(new Vertex(id))));
-			} else if (e.getV2().equals(id) && e.getWeight() + accumulator < range) {
+				resultGraph = rangedDfsUndirected(e.getV2(), range, e.getWeight(criteria) + accumulator, resultGraph,
+						this.vertex.get(this.vertex.indexOf(new Vertex(id))), criteria);
+			} else if (e.getV2().equals(id) && e.getWeight(criteria) + accumulator < range) {
 				resultGraph.addVertex(e.getV1());
-				resultGraph = rangedDfsUndirected(e.getV1(), range, e.getWeight() + accumulator, resultGraph,
-						this.vertex.get(this.vertex.indexOf(new Vertex(id))));
+				resultGraph = rangedDfsUndirected(e.getV1(), range, e.getWeight(criteria) + accumulator, resultGraph,
+						this.vertex.get(this.vertex.indexOf(new Vertex(id))), criteria);
 			}
 		}
 		return resultGraph;
 	}
 
-	public ArrayList<Vertex> invertedRangedDfs(String id, double range){
+	public ArrayList<Vertex> invertedRangedDfs(String id, double range, int criteria){
 		Graph cloneGraph = new Graph(this);
-		ArrayList<Vertex> rdfsVertex = rangedDfs(id, range);
+		ArrayList<Vertex> rdfsVertex = rangedDfs(id, range, criteria);
 		for(Vertex v: rdfsVertex){
 			cloneGraph.removeVertex(v.getIdentifier());
 		}
@@ -223,7 +225,7 @@ public class Graph {
 		return this.vertex.contains(new Vertex(id));
 	}
 
-	public Graph dijkstra(String id) {
+	public Graph dijkstra(String id, int criteria) {
 		if (!this.vertex.contains(new Vertex(id))) {
 			return null;
 		}
@@ -248,10 +250,10 @@ public class Graph {
 		while (!pq.isEmpty()) {
 			for (Edge e : this.vertex.get(this.vertex.indexOf(new Vertex(pq.peek()))).getEdges()) {
 				if (this.directed && e.getFrom().equals(pq.peek())) {
-					if (values.get(e.getTo()) >= e.getWeight() + values.get(e.getFrom())) {
+					if (values.get(e.getTo()) >= e.getWeight(criteria) + values.get(e.getFrom())) {
 
 						values.remove(e.getTo());
-						values.put(e.getTo(), e.getWeight() + values.get(e.getFrom()));
+						values.put(e.getTo(), e.getWeight(criteria) + values.get(e.getFrom()));
 						previous.remove(e.getTo());
 						previous.put(e.getTo(), e.getFrom());
 						if (pq.contains(e.getTo())) {
@@ -263,9 +265,9 @@ public class Graph {
 				} else if (!this.directed) {
 					if (e.getV1().equals(pq.peek()) && (previous.get(pq.peek()) == null) ? true
 							: !previous.get(pq.peek()).equals(e.getV2())) {
-						if (values.get(e.getV2()) >= e.getWeight() + values.get(e.getV1())) {
+						if (values.get(e.getV2()) >= e.getWeight(criteria) + values.get(e.getV1())) {
 							values.remove(e.getV2());
-							values.put(e.getV2(), e.getWeight() + values.get(e.getV1()));
+							values.put(e.getV2(), e.getWeight(criteria) + values.get(e.getV1()));
 							previous.remove(e.getV2());
 							previous.put(e.getV2(), e.getV1());
 							if (pq.contains(e.getV2())) {
@@ -275,9 +277,9 @@ public class Graph {
 							pq.add(e.getV2());
 						}
 					} else if (e.getV2().equals(pq.peek()) && !previous.get(pq.peek()).equals(e.getV1())) {
-						if (values.get(e.getV1()) >= e.getWeight() + values.get(e.getV2())) {
+						if (values.get(e.getV1()) >= e.getWeight(criteria) + values.get(e.getV2())) {
 							values.remove(e.getV1());
-							values.put(e.getV1(), e.getWeight() + values.get(e.getV2()));
+							values.put(e.getV1(), e.getWeight(criteria) + values.get(e.getV2()));
 							previous.remove(e.getV1());
 							previous.put(e.getV1(), e.getV2());
 							if (pq.contains(e.getV1())) {
@@ -295,7 +297,8 @@ public class Graph {
 		for (Vertex v : this.vertex) {
 			dijkstraGraph.addVertex(v.getIdentifier());
 			if (previous.get(v.getIdentifier()) != null) {
-				dijkstraGraph.addEdge(previous.get(v.getIdentifier()), v.getIdentifier(), 0.0, true);
+				double[] temp = {0.0, 0.0};
+				dijkstraGraph.addEdge(previous.get(v.getIdentifier()), v.getIdentifier(), temp, true);
 			}
 		}
 
@@ -303,7 +306,7 @@ public class Graph {
 
 	}
 
-	public ArrayList<Graph> yen(String startId, String endId, int nrPaths) {
+	public ArrayList<Graph> yen(String startId, String endId, int nrPaths, int criteria) {
 
 		if (!this.vertex.contains(new Vertex(startId)) || !this.vertex.contains(new Vertex(endId))) {
 			return null;
@@ -311,7 +314,7 @@ public class Graph {
 
 		ArrayList<Graph> yenArray = new ArrayList<Graph>();
 		// get the shortest path -> the first one on the array
-		yenArray.add(dijkstra(startId)); // SUBSTITUIR PELO DO TRINDADE
+		yenArray.add(dijkstra(startId, criteria)); // SUBSTITUIR PELO DO TRINDADE
 
 		ArrayList<Vertex> rootPath = new ArrayList<Vertex>();
 		Vertex spurVertex;
@@ -337,23 +340,23 @@ public class Graph {
 							// set the weight to max
 							if (v1.equals(this.vertex.get(index).getEdges().get(j).getV1())) {
 								if (v2.equals(this.vertex.get(index).getEdges().get(j).getV2())) {
-									originalWeight = this.vertex.get(index).getEdges().get(j).getWeight();
-									this.vertex.get(index).getEdges().get(j).setWeight(Double.MAX_VALUE);
+									originalWeight = this.vertex.get(index).getEdges().get(j).getWeight(criteria);
+									this.vertex.get(index).getEdges().get(j).setWeight(Double.MAX_VALUE, criteria);
 								}
 							}
 							if (v2.equals(this.vertex.get(index).getEdges().get(j).getV1())) {
 								if (v1.equals(this.vertex.get(index).getEdges().get(j).getV2())) {
-									originalWeight = this.vertex.get(index).getEdges().get(j).getWeight();
-									this.vertex.get(index).getEdges().get(j).setWeight(Double.MAX_VALUE);
+									originalWeight = this.vertex.get(index).getEdges().get(j).getWeight(criteria);
+									this.vertex.get(index).getEdges().get(j).setWeight(Double.MAX_VALUE, criteria);
 								}
 							}
 						}
 					}
 
-					yenArray.add(dijkstra(spurVertex.getIdentifier())); // SUBSTITUIR
-																		// PELO
-																		// DO
-																		// TRINDADE
+					yenArray.add(dijkstra(spurVertex.getIdentifier(), criteria)); // SUBSTITUIR
+																				  // PELO
+																				  // DO
+																				  // TRINDADE
 
 					for (int index = 0; index < this.vertex.size(); index++) {
 						for (int j = 0; j < this.vertex.get(index).getEdges().size(); j++) {
@@ -361,10 +364,10 @@ public class Graph {
 							// set the weight back to its original value
 							if (v1.equals(this.vertex.get(index).getEdges().get(j).getV1()))
 								if (v2.equals(this.vertex.get(index).getEdges().get(j).getV2()))
-									this.vertex.get(index).getEdges().get(j).setWeight(originalWeight);
+									this.vertex.get(index).getEdges().get(j).setWeight(originalWeight, criteria);
 							if (v2.equals(this.vertex.get(index).getEdges().get(j).getV1()))
 								if (v1.equals(this.vertex.get(index).getEdges().get(j).getV2()))
-									this.vertex.get(index).getEdges().get(j).setWeight(originalWeight);
+									this.vertex.get(index).getEdges().get(j).setWeight(originalWeight, criteria);
 
 						}
 					}
@@ -420,7 +423,7 @@ public class Graph {
 	}
 
 	public static void main(String args[]) {
-		Graph testG = new Graph(UNDIRECTED);
+		Graph testG = new Graph(DIRECTED);
 
 		/*
 		 * testG.addEdge("A", "C", 10.0, true); testG.addEdge("A", "D", 3.0,
@@ -430,32 +433,33 @@ public class Graph {
 		 * testG.addEdge("E", "F", 4.0, true);
 		 */
 
-		testG.addEdge("A", "B", 10.0, true);
-		testG.addEdge("B", "C", 20.0, true);
-		testG.addEdge("B", "D", 5.0, true);
-		testG.addEdge("D", "C", 55.0, true);
+		testG.addEdge("A", "B", new double[]{10.0, 10.0}, true);
+		testG.addEdge("B", "C", new double[]{20.0, 20.0}, true);
+		testG.addEdge("B", "D", new double[]{5.0, 5.0}, true);
+		testG.addEdge("D", "C", new double[]{55.0, 55.0}, true);
 
 		Graph testG2 = new Graph(testG);
 		// System.out.println(testG.getVertex().indexOf("A"));
 		
-		System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
-		System.out.println("\n\n\n" + testG.rangedDfs("A", 30.0));
+		//System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
+		//System.out.println("\n\n\n" + testG.rangedDfs("A", 30.0));
 		
-		for(Vertex v: testG.invertedRangedDfs("A", 30.0)){
+		/*for(Vertex v: testG.invertedRangedDfs("A", 30.0, DISTANCE)){
 			System.out.println(v.getIdentifier());
 		}
 		
-		for(Vertex v: testG.rangedDfs("A", 30.0)){
+		for(Vertex v: testG.rangedDfs("A", 30.0, DISTANCE)){
 			System.out.println(v.getIdentifier());
 		}
 		
-		System.out.println(testG);
+		System.out.println(testG);*/
 		
 		
 		
 		
-		/*Graph otherG = testG.dijkstra("A");
-		 System.out.println(otherG);*/
+		Graph otherG = testG.dijkstra("A", DISTANCE);
+		 System.out.println(otherG);
+		 System.out.println("\n\n\n" + testG);
 
 	}
 }
