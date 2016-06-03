@@ -24,7 +24,12 @@ public class Graph {
 	public Graph(Graph toClone) {
 		this.vertex = new ArrayList<Vertex>();
 		for(Vertex v: toClone.vertex){
-			this.vertex.add(v);
+			Vertex toAdd = new Vertex(v.getIdentifier());
+			
+			for(Edge e: v.getEdges()){
+				toAdd.getEdges().add(e);
+			}
+			this.vertex.add(toAdd);
 		}
 		
 		this.directed = toClone.directed;
@@ -126,10 +131,10 @@ public class Graph {
 
 	}
 
-	public Graph rangedDfs(String id, double range) {
+	public ArrayList<Vertex> rangedDfs(String id, double range) {
 		Graph g = new Graph(this.directed);
 		g.addVertex(id);
-		return (this.directed) ? rangedDfsDirected(id, range, 0.0, g) : rangedDfsUndirected(id, range, 0.0, g, null);
+		return (this.directed) ? rangedDfsDirected(id, range, 0.0, g).vertex : rangedDfsUndirected(id, range, 0.0, g, null).vertex;
 	}
 
 	public Graph rangedDfsDirected(String id, double range, double accumulator, Graph resultGraph) {
@@ -170,13 +175,13 @@ public class Graph {
 		return resultGraph;
 	}
 
-	public Graph invertedRangedDfs(String id, double range){
+	public ArrayList<Vertex> invertedRangedDfs(String id, double range){
 		Graph cloneGraph = new Graph(this);
-		Graph normalRDFS = rangedDfs(id, range);
-		for(Vertex v: normalRDFS.vertex){
+		ArrayList<Vertex> rdfsVertex = rangedDfs(id, range);
+		for(Vertex v: rdfsVertex){
 			cloneGraph.removeVertex(v.getIdentifier());
 		}
-		return cloneGraph;
+		return cloneGraph.vertex;
 	}
 	
 	public Graph getCommonVertex(Graph g1, Graph g2){
@@ -433,13 +438,22 @@ public class Graph {
 		Graph testG2 = new Graph(testG);
 		// System.out.println(testG.getVertex().indexOf("A"));
 		
-		//System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
-		//System.out.println("\n\n\n" + testG.rangedDfs("A", 30.0));
+		System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
+		System.out.println("\n\n\n" + testG.rangedDfs("A", 30.0));
+		
+		for(Vertex v: testG.invertedRangedDfs("A", 30.0)){
+			System.out.println(v.getIdentifier());
+		}
+		
+		for(Vertex v: testG.rangedDfs("A", 30.0)){
+			System.out.println(v.getIdentifier());
+		}
+		
 		System.out.println(testG);
-		testG.removeEdge("A", "B");
-		System.out.println(testG);
-		System.out.println(testG2);
-
+		
+		
+		
+		
 		/*Graph otherG = testG.dijkstra("A");
 		 System.out.println(otherG);*/
 
