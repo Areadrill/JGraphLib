@@ -22,7 +22,11 @@ public class Graph {
 	}
 
 	public Graph(Graph toClone) {
-		this.vertex = toClone.vertex;
+		this.vertex = new ArrayList<Vertex>();
+		for(Vertex v: toClone.vertex){
+			this.vertex.add(v);
+		}
+		
 		this.directed = toClone.directed;
 	}
 
@@ -173,6 +177,17 @@ public class Graph {
 			cloneGraph.removeVertex(v.getIdentifier());
 		}
 		return cloneGraph;
+	}
+	
+	public Graph getCommonVertex(Graph g1, Graph g2){
+		ListIterator<Vertex> it = g1.getVertex().listIterator();
+		while(it.hasNext()){
+			Vertex v = it.next();
+			if(!g2.getVertex().contains(v)){
+				it.remove();
+			}
+		}
+		return g1 ;
 	}
 	
 	public String toString() {
@@ -415,13 +430,15 @@ public class Graph {
 		testG.addEdge("B", "D", 5.0, true);
 		testG.addEdge("D", "C", 55.0, true);
 
-		System.out.println(testG);
-
+		Graph testG2 = new Graph(testG);
 		// System.out.println(testG.getVertex().indexOf("A"));
-
-		System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
-
-		// testG.printEdges();
+		
+		//System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
+		//System.out.println("\n\n\n" + testG.rangedDfs("A", 30.0));
+		System.out.println(testG);
+		testG.removeEdge("A", "B");
+		System.out.println(testG);
+		System.out.println(testG2);
 
 		/*Graph otherG = testG.dijkstra("A");
 		 System.out.println(otherG);*/
