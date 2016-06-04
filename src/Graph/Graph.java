@@ -224,6 +224,37 @@ public class Graph {
 	public boolean checkExistsVertex(String id) {
 		return this.vertex.contains(new Vertex(id));
 	}
+	
+	public Graph passing(String origin, String destination, String passing, int criteria){
+		Graph result = new Graph(this.directed);
+		
+		Graph firstLeg = yen(origin, passing, 1, criteria).get(0);
+		Graph secondLeg = yen(passing, destination, 1, criteria).get(0);
+		
+		for(Vertex v: firstLeg.getVertex()){
+			for (Edge e: v.getEdges()){
+				if(this.directed){
+					result.addEdge(e.getFrom(), e.getTo(), e.getWeight(), true);
+				}
+				else{
+					result.addEdge(e.getV1(), e.getV2(), e.getWeight(), true);
+				}
+			}
+		}
+		
+		for(Vertex v: secondLeg.getVertex()){
+			for (Edge e: v.getEdges()){
+				if(this.directed){
+					result.addEdge(e.getFrom(), e.getTo(), e.getWeight(), true);
+				}
+				else{
+					result.addEdge(e.getV1(), e.getV2(), e.getWeight(), true);
+				}
+			}
+		}
+		
+		return result;
+	}
 
 	public Graph dijkstra(String id, int criteria) {
 		if (!this.vertex.contains(new Vertex(id))) {
