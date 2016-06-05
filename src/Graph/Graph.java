@@ -21,15 +21,26 @@ public class Graph {
 	private Set<String> onPath = new HashSet<String>();
 	private ArrayList<Stack<String>> paths = new ArrayList<Stack<String>>();
 
+	/**
+	 * @Constructor: Creates an empty undirected graph
+	 */
 	public Graph() {
 		this(false);
 	}
 
+	/**
+	 * @Constructor: Creates an empty graph
+	 * @param directed Determines whether the graph is directed or not. true = directed, false = undirected
+	 */
 	public Graph(boolean directed) {
 		this.vertex = new ArrayList<Vertex>();
 		this.directed = directed;
 	}
 
+	/**
+	 * @Constructor: Creates a graph that's a clone of toClone
+	 * @param toClone The graph to copy
+	 */
 	public Graph(Graph toClone) {
 		this.vertex = new ArrayList<Vertex>();
 		for (Vertex v : toClone.vertex) {
@@ -44,6 +55,11 @@ public class Graph {
 		this.directed = toClone.directed;
 	}
 
+	/**
+	 * Adds a vertex to the graph
+	 * @param id The identifier for the graph
+	 * @return true if created, false if a vertex with the same ID already existed
+	 */
 	public boolean addVertex(String id) {
 		if (id == null)
 			return false;
@@ -53,10 +69,24 @@ public class Graph {
 		return false;
 	}
 
+	/**
+	 * Adds an edge to the mentioned vertex
+	 * @param v1 first vertex
+	 * @param v2 second vertex
+	 * @param w weights for the edge
+	 */
 	public void addEdge(String v1, String v2, double[] w) {
 		addEdge(v1, v2, w, false);
 	}
 
+	/**
+	 * Adds an edge to the mentioned vertex
+	 * @param v1 first vertex
+	 * @param v2 second vertex
+	 * @param w weights for the edge
+	 * @param force if true and one of the passed IDs doesn't correspond to a vertex, the vertex will be created
+	 * @return true if the edge is created, false if not
+	 */
 	public boolean addEdge(String v1, String v2, double[] w, boolean force) {
 		if (!this.vertex.contains(new Vertex(v1))) {
 			if (force) {
@@ -84,6 +114,12 @@ public class Graph {
 
 	}
 
+	/**
+	 * Removes the edge that connects the mentioned vertex
+	 * @param v1 first vertex
+	 * @param v2 second vertex
+	 * @return true if the edge is removed, false otherwise
+	 */
 	public boolean removeEdge(String v1, String v2) {
 		if (v1 == null || v2 == null) {
 			return false;
@@ -98,6 +134,11 @@ public class Graph {
 		return true;
 	}
 
+	/**
+	 * Removes the edge edge that's passed as a parameter
+	 * @param e
+	 * @return true if removed, false otherwise
+	 */
 	public boolean removeEdge(Edge e) {
 		if (e == null) {
 			return false;
@@ -109,6 +150,11 @@ public class Graph {
 		}
 	}
 
+	/**
+	 * Removes the mentioned vertex from the graph, removing also all of the associated edges
+	 * @param id
+	 * @return
+	 */
 	public boolean removeVertex(String id) {
 		if (id == null) {
 			return false;
@@ -137,6 +183,13 @@ public class Graph {
 
 	}
 
+	/**
+	 * Goes through the graph depth-first until it reaches the provided range
+	 * @param id
+	 * @param range The weight at which to stop 
+	 * @param criteria The weight to use (distance or time)
+	 * @return An ArrayList with all the visited vertex
+	 */
 	public ArrayList<Vertex> rangedDfs(String id, double range, int criteria) {
 		Graph g = new Graph(this.directed);
 		g.addVertex(id);
@@ -144,6 +197,15 @@ public class Graph {
 				: rangedDfsUndirected(id, range, 0.0, g, null, criteria).vertex;
 	}
 
+	/**
+	 * Goes through a directed graph depth-first until it reaches the provided range
+	 * @param id The vertex from which to start
+	 * @param range The weight at which to stop 
+	 * @param accumulator The accumulated weight of all nodes visited from root to the last node visited
+	 * @param resultGraph The graph with all of the vertex visited so far
+	 * @param criteria The weight to use (distance or time)
+	 * @return The graph with all of the vertex visited
+	 */
 	public Graph rangedDfsDirected(String id, double range, double accumulator, Graph resultGraph, int criteria) {
 		if (accumulator >= range)
 			return resultGraph;
@@ -161,6 +223,16 @@ public class Graph {
 		return resultGraph;
 	}
 
+	/**
+	 * Goes through a directed graph depth-first until it reaches the provided range
+	 * @param id The vertex from which to start
+	 * @param range The weight at which to stop 
+	 * @param accumulator The accumulated weight of all nodes visited from root to the last node visited
+	 * @param resultGraph The graph with all of the vertex visited so far
+	 * @param previous The last visited node
+	 * @param criteria The weight to use (distance or time)
+	 * @return The graph with all of the vertex visited
+	 */
 	public Graph rangedDfsUndirected(String id, double range, double accumulator, Graph resultGraph, Vertex previous,
 			int criteria) {
 		if (accumulator >= range)
@@ -184,6 +256,13 @@ public class Graph {
 		return resultGraph;
 	}
 
+	/**
+	 * Uses rangedDfs to return all of the vertex that weren't visited
+	 * @param id The vertex from which to start
+	 * @param range The weight at which to stop
+	 * @param criteria The weight to use (distance or time)
+	 * @return An ArrayList with all the visited vertex
+	 */
 	public ArrayList<Vertex> invertedRangedDfs(String id, double range, int criteria) {
 		Graph cloneGraph = new Graph(this);
 		ArrayList<Vertex> rdfsVertex = rangedDfs(id, range, criteria);
@@ -193,6 +272,12 @@ public class Graph {
 		return cloneGraph.vertex;
 	}
 	
+	/**
+	 * Gets the vertex that exist in both of the passed ArrayLists
+	 * @param v1 first ArrayList 
+	 * @param v2 second ArrayList
+	 * @return An ArrayList with all of the common vertex
+	 */
 	public ArrayList<Vertex> getCommonVertex(ArrayList<Vertex> v1, ArrayList<Vertex> v2){
 		ArrayList<Vertex> vTemp = new ArrayList<Vertex>();
 		for(Vertex v: v1){
@@ -209,6 +294,9 @@ public class Graph {
 		return vTemp ;
 	}
 
+	/**
+	 * Returns a string containing the edges and all of their connections
+	 */
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (Vertex v : vertex) {
@@ -229,10 +317,19 @@ public class Graph {
 		return builder.toString();
 	}
 
+	/**
+	 * Gets the number of vertex in this graph
+	 * @return The number of vertex in this graph
+	 */
 	public int getNumVertex() {
 		return this.vertex.size();
 	}
 
+	/**
+	 * Checks if a vertex with the passed ID exists in this graph
+	 * @param id The ID to check
+	 * @return true if vertex exists, false otherwise
+	 */
 	public boolean checkExistsVertex(String id) {
 		return this.vertex.contains(new Vertex(id));
 	}
@@ -257,6 +354,12 @@ public class Graph {
 	 * return result; }
 	 */
 
+	/**
+	 * Gets the shortest path from the mentioned vertex to all other vertex
+	 * @param id The vertex from which to start
+	 * @param criteria The weight to use (distance or time)
+	 * @return A graph with only the shortest paths from the mentioned node to all other nodes
+	 */
 	public Graph dijkstra(String id, int criteria) {
 		if (!this.vertex.contains(new Vertex(id))) {
 			return null;
@@ -338,6 +441,13 @@ public class Graph {
 
 	}
 
+	/**
+	 * Gets the shortest path between the mentioned vertex
+	 * @param start Vertex at which to start
+	 * @param end Destination vertex
+	 * @param criteria The weight to use (distance or time)
+	 * @return A graph containing the shortest path between the two vertex
+	 */
 	public Graph dijkstraYen(String start, String end, int criteria) {
 
 		Graph graph = new Graph();
@@ -407,6 +517,13 @@ public class Graph {
 
 	}
 
+	/**
+	 * Return the weight of the edge that exists between the mentioned nodes
+	 * @param startVertex The vertex at which to start
+	 * @param endVertex The destination vertex
+	 * @param criteria The weight to obtain (distance or time)
+	 * @return The weight of the aforementioned edge
+	 */
 	private double getEdgeWeight(String startVertex, String endVertex, int criteria) {
 
 		Vertex start = getGraphVertex(this, startVertex);
@@ -425,6 +542,11 @@ public class Graph {
 
 	}
 
+	/**
+	 * Gets all paths between the mentioned vertex
+	 * @param start Fisrt vertex
+	 * @param end Second vertex
+	 */
 	private void allPaths(String start, String end) {
 
 		path.push(start);
@@ -446,6 +568,11 @@ public class Graph {
 		onPath.remove(start);
 	}
 
+	/**
+	 * Gets all of the vertex that are adjacent to the mentioned vertex
+	 * @param v The vertex to start from
+	 * @return An ArrayList with all of the adjacent vertex
+	 */
 	private ArrayList<String> adjacentTo(String v) {
 
 		ArrayList<String> adjacents = new ArrayList<String>();
@@ -461,6 +588,12 @@ public class Graph {
 		return adjacents;
 	}
 
+	/**
+	 * Get the vertex with the passed ID from the mentioned graph
+	 * @param graph graph in which to search
+	 * @param id ID for which to search
+	 * @return The vertex
+	 */
 	public Vertex getGraphVertex(Graph graph, String id) {
 
 		for (int i = 0; i < graph.getNumVertex(); i++) {
@@ -473,6 +606,14 @@ public class Graph {
 		return null;
 	}
 
+	/**
+	 * Returns the requested number of paths between the two mentioned vertex
+	 * @param startId First vertex
+	 * @param endId Second vertex
+	 * @param nrPaths Number of paths to get
+	 * @param criteria The weight to use (distance or time)
+	 * @return An ArrayList with Graphs containing the requested paths
+	 */
 	public ArrayList<Graph> yen(String startId, String endId, int nrPaths, int criteria) {
 
 		if (!this.vertex.contains(new Vertex(startId)) || !this.vertex.contains(new Vertex(endId))) {
@@ -552,6 +693,12 @@ public class Graph {
 
 	}
 
+	/**
+	 * Gets the number of vertex between the two mentioned vertex
+	 * @param source First vertex
+	 * @param spur Second vertex
+	 * @return The number of vertex between the two mentioned vertex
+	 */
 	private int getDistance(String source, String spur) {
 		Vertex sourceNode = getGraphVertex(this, source);
 		Vertex spurNode = getGraphVertex(this, spur);
@@ -568,6 +715,12 @@ public class Graph {
 
 	}
 
+	/**
+	 * Gets the path between the two mentioned vertes
+	 * @param source First vertex 
+	 * @param spur Second vertex
+	 * @return An ArrayList with the vertex between the two mentioned nodes
+	 */
 	private ArrayList<Vertex> rootPath(String source, String spur) {
 
 		Vertex sourceNode = getGraphVertex(this, source);
@@ -593,6 +746,11 @@ public class Graph {
 
 	}
 
+	/**
+	 * 
+	 * Class needed for dijkstra to get the correct priorities in a PriorityQueue
+	 *
+	 */
 	private class VComparator implements Comparator<String> {
 		HashMap<String, Double> values;
 
@@ -611,6 +769,9 @@ public class Graph {
 
 	}
 
+	/**
+	 * Print all the edges in the graph
+	 */
 	public void printEdges() {
 		for (Vertex v : this.vertex) {
 			for (Edge e : v.getEdges()) {
@@ -621,6 +782,10 @@ public class Graph {
 		System.out.println("\n\n\n");
 	}
 
+	/**
+	 * Gets this graph's vertex
+	 * @return An Arraylist with this graph's vertex
+	 */
 	public ArrayList<Vertex> getVertex() {
 		return vertex;
 	}
