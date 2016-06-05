@@ -193,16 +193,12 @@ public class Graph {
 		return cloneGraph.vertex;
 	}
 
-	public Graph getCommonVertex(Graph g1, Graph g2) {
-		ListIterator<Vertex> it = g1.getVertex().listIterator();
-		while (it.hasNext()) {
-			Vertex v = it.next();
-			if (!g2.getVertex().contains(v)) {
-				it.remove();
-			}
-		}
-		return g1;
-	}
+	/*
+	 * public Graph getCommonVertex(Graph g1, Graph g2) { ListIterator<Vertex>
+	 * it = g1.getNumVertex().listIterator(); while (it.hasNext()) { Vertex v =
+	 * it.next(); if (!g2.getNumVertex().contains(v)) { it.remove(); } } return
+	 * g1; }
+	 */
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -232,34 +228,25 @@ public class Graph {
 		return this.vertex.contains(new Vertex(id));
 	}
 
-	public Graph passing(String origin, String destination, String passing, int criteria) {
-		Graph result = new Graph(this.directed);
-
-		Graph firstLeg = yen(origin, passing, 1, criteria).get(0);
-		Graph secondLeg = yen(passing, destination, 1, criteria).get(0);
-
-		for (Vertex v : firstLeg.getVertex()) {
-			for (Edge e : v.getEdges()) {
-				if (this.directed) {
-					result.addEdge(e.getFrom(), e.getTo(), e.getWeight(), true);
-				} else {
-					result.addEdge(e.getV1(), e.getV2(), e.getWeight(), true);
-				}
-			}
-		}
-
-		for (Vertex v : secondLeg.getVertex()) {
-			for (Edge e : v.getEdges()) {
-				if (this.directed) {
-					result.addEdge(e.getFrom(), e.getTo(), e.getWeight(), true);
-				} else {
-					result.addEdge(e.getV1(), e.getV2(), e.getWeight(), true);
-				}
-			}
-		}
-
-		return result;
-	}
+	/*
+	 * public Graph passing(String origin, String destination, String passing,
+	 * int criteria) { Graph result = new Graph(this.directed);
+	 * 
+	 * Graph firstLeg = yen(origin, passing, 1, criteria).get(0); Graph
+	 * secondLeg = yen(passing, destination, 1, criteria).get(0);
+	 * 
+	 * for (Vertex v : firstLeg.getNumVertex()) { for (Edge e : v.getEdges()) {
+	 * if (this.directed) { result.addEdge(e.getFrom(), e.getTo(),
+	 * e.getWeight(), true); } else { result.addEdge(e.getV1(), e.getV2(),
+	 * e.getWeight(), true); } } }
+	 * 
+	 * for (Vertex v : secondLeg.getNumVertex()) { for (Edge e : v.getEdges()) {
+	 * if (this.directed) { result.addEdge(e.getFrom(), e.getTo(),
+	 * e.getWeight(), true); } else { result.addEdge(e.getV1(), e.getV2(),
+	 * e.getWeight(), true); } } }
+	 * 
+	 * return result; }
+	 */
 
 	public Graph dijkstra(String id, int criteria) {
 		if (!this.vertex.contains(new Vertex(id))) {
@@ -355,56 +342,56 @@ public class Graph {
 		double totalWeight = 0;
 
 		for (int j = 0; j < copy.paths.size(); j++) {
-			
+
 			Stack<String> path = copy.paths.get(j);
 			Stack<String> copiedStack = (Stack<String>) path.clone();
 			int totalSize = path.size() - 1;
 			String startVertex = path.pop();
 			String endVertex = path.pop();
-			
+
 			for (int k = 0; k < totalSize; k++) {
 				double edgeWeight = getEdgeWeight(startVertex, endVertex, criteria);
 				totalWeight += edgeWeight;
 				startVertex = endVertex;
-				if(k == totalSize - 1)
+				if (k == totalSize - 1)
 					break;
 				endVertex = path.pop();
 			}
-	
+
 			totalPathWeight.put(copiedStack, totalWeight);
 			totalWeight = 0;
 
 		}
-		
+
 		for (HashMap.Entry<Stack<String>, Double> entry : totalPathWeight.entrySet()) {
 			ArrayList<String> path = new ArrayList<String>(entry.getKey());
 			totalPathWeightConverted.put(path, entry.getValue());
 		}
-		
+
 		ArrayList<String> bestPath = new ArrayList<String>();
 		Double previousBetter = Double.MAX_VALUE;
-		
+
 		for (HashMap.Entry<ArrayList<String>, Double> entry : totalPathWeightConverted.entrySet()) {
-			if(entry.getValue() < previousBetter){
+			if (entry.getValue() < previousBetter) {
 				previousBetter = entry.getValue();
 				bestPath = entry.getKey();
 			}
 		}
-		
-		for(int l = 0; l < (bestPath.size()-1); l++){
+
+		for (int l = 0; l < (bestPath.size() - 1); l++) {
 			double[] total = new double[2];
 			double weight1;
 			double weight2;
-			if(criteria == DISTANCE){
-				weight1 = getEdgeWeight(bestPath.get(l), bestPath.get(l+1), criteria);
-				weight2 = getEdgeWeight(bestPath.get(l), bestPath.get(l+1), TIME);
-			}else{
-				weight2 = getEdgeWeight(bestPath.get(l), bestPath.get(l+1), criteria);
-				weight1 = getEdgeWeight(bestPath.get(l), bestPath.get(l+1), DISTANCE);
+			if (criteria == DISTANCE) {
+				weight1 = getEdgeWeight(bestPath.get(l), bestPath.get(l + 1), criteria);
+				weight2 = getEdgeWeight(bestPath.get(l), bestPath.get(l + 1), TIME);
+			} else {
+				weight2 = getEdgeWeight(bestPath.get(l), bestPath.get(l + 1), criteria);
+				weight1 = getEdgeWeight(bestPath.get(l), bestPath.get(l + 1), DISTANCE);
 			}
 			total[0] = weight1;
 			total[1] = weight2;
-			graph.addEdge(bestPath.get(l), bestPath.get(l+1), total, true);
+			graph.addEdge(bestPath.get(l), bestPath.get(l + 1), total, true);
 		}
 
 		return graph;
@@ -467,10 +454,10 @@ public class Graph {
 
 	public Vertex getGraphVertex(Graph graph, String id) {
 
-		for (int i = 0; i < graph.getVertex().size(); i++) {
+		for (int i = 0; i < graph.getNumVertex(); i++) {
 
-			if (graph.getVertex().get(i).getIdentifier().equals(id))
-				return graph.getVertex().get(i);
+			if (graph.vertex.get(i).getIdentifier().equals(id))
+				return graph.vertex.get(i);
 
 		}
 
@@ -484,9 +471,9 @@ public class Graph {
 		}
 
 		ArrayList<Graph> yenArray = new ArrayList<Graph>();
+
 		// get the shortest path -> the first one on the array
-		yenArray.add(dijkstra(startId, criteria)); // SUBSTITUIR PELO DO
-													// TRINDADE
+		yenArray.add(dijkstraYen(startId, endId, criteria));
 
 		ArrayList<Vertex> rootPath = new ArrayList<Vertex>();
 		Vertex spurVertex;
@@ -495,14 +482,21 @@ public class Graph {
 
 		for (int k = 1; k < nrPaths; k++) {
 
-			for (int i = 0; i < (yenArray.get(k - 1).vertex.size() - 1); i++) {
+			Graph current = yenArray.get(k - 1);
 
-				spurVertex = yenArray.get(k - 1).vertex.get(i);
-				rootPath = rootPath(yenArray.get(k - 1), i);
+			int max = current.getNumVertex();
+
+			for (int i = 0; i < (max-1); i++) {
+
+				spurVertex = current.vertex.get(i);
+				System.out.println("spur " + i + " is " + spurVertex.getIdentifier());
+				rootPath = current.rootPath(startId, spurVertex.getIdentifier());
 
 				if (rootPath.size() != 0) {
-					v1 = rootPath.get(rootPath.size() - 2).getIdentifier();
-					v2 = rootPath.get(rootPath.size() - 1).getIdentifier();
+					v1 = rootPath.get(rootPath.size() - 1).getIdentifier();
+					System.out.println("v1 = " + v1);
+					v2 = current.vertex.get(i+1).getIdentifier();
+					System.out.println("v2 = " + v2);
 
 					double originalWeight = 0;
 
@@ -525,10 +519,7 @@ public class Graph {
 						}
 					}
 
-					yenArray.add(dijkstra(spurVertex.getIdentifier(), criteria)); // SUBSTITUIR
-																					// PELO
-																					// DO
-																					// TRINDADE
+					yenArray.add(dijkstraYen(startId, endId, criteria));
 
 					for (int index = 0; index < this.vertex.size(); index++) {
 						for (int j = 0; j < this.vertex.get(index).getEdges().size(); j++) {
@@ -552,12 +543,42 @@ public class Graph {
 
 	}
 
-	private ArrayList<Vertex> rootPath(Graph spurGraph, int i) {
+	private int getDistance(String source, String spur) {
+		Vertex sourceNode = getGraphVertex(this, source);
+		Vertex spurNode = getGraphVertex(this, spur);
+
+		int distance = 0;
+
+		for (int i = 0; i < this.getNumVertex(); i++) {
+			if (this.vertex.get(i) == spurNode)
+				break;
+			distance++;
+		}
+
+		return distance;
+
+	}
+
+	private ArrayList<Vertex> rootPath(String source, String spur) {
+
+		Vertex sourceNode = getGraphVertex(this, source);
+		Vertex spurNode = getGraphVertex(this, spur);
 
 		ArrayList<Vertex> rootPath = new ArrayList<Vertex>();
 
-		for (int j = 0; j < i; j++)
-			rootPath.add(spurGraph.vertex.get(j));
+		int distance = getDistance(source, spur);
+
+		System.out.println("rootPath " + distance);
+		for (int i = 0; i < (distance + 1); i++) {
+			if (this.vertex.get(i) != spurNode) {
+				rootPath.add(this.vertex.get(i));
+				System.out.println(this.vertex.get(i).getIdentifier());
+			} else {
+				rootPath.add(spurNode);
+				break;
+			}
+		}
+		System.out.println("rootPath end");
 
 		return rootPath;
 
@@ -645,8 +666,13 @@ public class Graph {
 		graph.addEdge("D", "E", new double[] { 1.0, 0.0 }, true);
 		graph.addEdge("C", "E", new double[] { 2.0, 0.0 }, true);
 
-		Graph path = graph.dijkstraYen("A", "E", DISTANCE);
-		path.printEdges();
+		ArrayList<Graph> paths = graph.yen("A", "E", 3, DISTANCE);
+		System.out.println("------------");
+		paths.get(0).printEdges();
+		System.out.println("------------");
+		paths.get(1).printEdges();
+		System.out.println("------------");
+		paths.get(2).printEdges();
 
 	}
 }
