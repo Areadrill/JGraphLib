@@ -186,15 +186,20 @@ public class Graph {
 		return cloneGraph.vertex;
 	}
 	
-	public Graph getCommonVertex(Graph g1, Graph g2){
-		ListIterator<Vertex> it = g1.getVertex().listIterator();
+	public ArrayList<Vertex> getCommonVertex(ArrayList<Vertex> v1, ArrayList<Vertex> v2){
+		ArrayList<Vertex> vTemp = new ArrayList<Vertex>();
+		for(Vertex v: v1){
+			vTemp.add(v);
+		}
+		
+		ListIterator<Vertex> it = vTemp.listIterator();
 		while(it.hasNext()){
 			Vertex v = it.next();
-			if(!g2.getVertex().contains(v)){
+			if(!v2.contains(v)){
 				it.remove();
 			}
 		}
-		return g1 ;
+		return vTemp ;
 	}
 	
 	public String toString() {
@@ -441,10 +446,8 @@ public class Graph {
 		Graph testG2 = new Graph(testG);
 		// System.out.println(testG.getVertex().indexOf("A"));
 		
-		//System.out.println("\n\n\n" + testG.invertedRangedDfs("A", 30.0));
-		//System.out.println("\n\n\n" + testG.rangedDfs("A", 30.0));
 		
-		/*for(Vertex v: testG.invertedRangedDfs("A", 30.0, DISTANCE)){
+		for(Vertex v: testG.invertedRangedDfs("A", 30.0, DISTANCE)){
 			System.out.println(v.getIdentifier());
 		}
 		
@@ -452,14 +455,16 @@ public class Graph {
 			System.out.println(v.getIdentifier());
 		}
 		
-		System.out.println(testG);*/
+		System.out.println(testG + "\n\n lol xd");
 		
 		
+		for(Vertex v: testG.getCommonVertex(testG.rangedDfs("A", 60.0, DISTANCE), testG.invertedRangedDfs("A", 5.0, DISTANCE))){
+			System.out.println(v.getIdentifier());
+		}
 		
-		
-		Graph otherG = testG.dijkstra("A", DISTANCE);
+		/*Graph otherG = testG.dijkstra("A", DISTANCE);
 		 System.out.println(otherG);
-		 System.out.println("\n\n\n" + testG);
+		 System.out.println("\n\n\n" + testG);*/
 
 	}
 }
