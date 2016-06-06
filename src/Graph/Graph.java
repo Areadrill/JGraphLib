@@ -774,7 +774,27 @@ public class Graph {
 			}
 		}
 	}
-
+	
+	/**
+	 * Print path from a graph
+	 */
+	public void printPath() {
+		ArrayList<String> visited = new ArrayList<>();
+		for (Vertex v : this.vertex) {
+			for (Edge e : v.getEdges()) {
+				if(this.directed){
+					System.out.println((this.directed) ? (e.getFrom() + "-->" + e.getTo()) : (e.getV1() + "---" + e.getV2()));
+				}
+				else{
+					if(!visited.contains(e.getV1())){
+						System.out.println((this.directed) ? (e.getFrom() + "-->" + e.getTo()) : (e.getV1() + "---" + e.getV2()));
+						visited.add(e.getV1());
+					}
+				}
+			}
+			
+		}
+	}
 	/**
 	 * Gets this graph's vertex
 	 * @return An Arraylist with this graph's vertex
