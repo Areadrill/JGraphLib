@@ -12,8 +12,8 @@ import java.util.Stack;
 public class Graph {
 	private static final boolean DIRECTED = true;
 	private static final boolean UNDIRECTED = false;
-	private static final int DISTANCE = 0;
-	private static final int TIME = 1;
+	public static final int DISTANCE = 0;
+	public static final int TIME = 1;
 	private ArrayList<Vertex> vertex;
 	private boolean directed;
 
@@ -639,14 +639,11 @@ public class Graph {
 			for (int i = 0; i < (max-1); i++) {
 
 				spurVertex = current.vertex.get(i);
-				System.out.println("spur " + i + " is " + spurVertex.getIdentifier());
 				rootPath = current.rootPath(startId, spurVertex.getIdentifier());
 
 				if (rootPath.size() != 0) {
 					v1 = rootPath.get(rootPath.size() - 1).getIdentifier();
-					System.out.println("v1 = " + v1);
 					v2 = current.vertex.get(i+1).getIdentifier();
-					System.out.println("v2 = " + v2);
 
 					double originalWeight = 0;
 
@@ -730,17 +727,14 @@ public class Graph {
 
 		int distance = getDistance(source, spur);
 
-		System.out.println("rootPath " + distance);
 		for (int i = 0; i < (distance + 1); i++) {
 			if (this.vertex.get(i) != spurNode) {
 				rootPath.add(this.vertex.get(i));
-				System.out.println(this.vertex.get(i).getIdentifier());
 			} else {
 				rootPath.add(spurNode);
 				break;
 			}
 		}
-		System.out.println("rootPath end");
 
 		return rootPath;
 
@@ -779,7 +773,6 @@ public class Graph {
 						.println((this.directed) ? (e.getFrom() + "-->" + e.getTo()) : (e.getV1() + "---" + e.getV2()));
 			}
 		}
-		System.out.println("\n\n\n");
 	}
 
 	/**
